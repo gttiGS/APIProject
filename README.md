@@ -1,6 +1,6 @@
 # Automação de Testes de API com Postmam e Newman
 
-Este projeto foi criado para auxiliar na execução de testes automatizados utilizando Postman e Newman. Ele permite organizar coleções de testes por tipo e ambiente, além de gerar relatórios detalhados em HTML para cada execução.
+Projeto criado para auxiliar na execução de testes automatizados utilizando Postman e Newman. Ele permite organizar coleções de testes por tipo e ambiente, além de gerar relatórios detalhados em HTML para cada execução.
 
 ## Requisitos
 
