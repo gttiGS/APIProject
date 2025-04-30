@@ -12,7 +12,7 @@ Projeto criado para auxiliar na execução de testes automatizados utilizando Po
 ### 1. Clone o repositório
 
 ```bash
-git clone https://github.com/gttiGS/api-test-project-postman-newman.git
+git clone https://github.com/gttiGS/APIProject
 cd api-test-project-postman-newman
 ```
 
