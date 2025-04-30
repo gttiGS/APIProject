@@ -1,0 +1,687 @@
+{
+	"info": {
+		"_postman_id": "b21bb158-c031-4152-8198-4ade51143ceb",
+		"name": "3 - Testes Funcionais",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43926541",
+		"_collection_link": "https://suprah-6305431.postman.co/workspace/Testes-de-API---ServeRest~b38aafb2-7a13-49a9-ba9b-f77196178608/collection/43926541-b21bb158-c031-4152-8198-4ade51143ceb?action=share&source=collection_link&creator=43926541"
+	},
+	"item": [
+		{
+			"name": "Login no Sistema - Inválido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 401\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para login inválido\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Email e/ou senha inválidos\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"gustavo@testeqa.com\",\r\n  \"password\": \"gteste0111111\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}login",
+					"host": [
+						"{{baseUrl}}login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar Usuário Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para cadastro realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"const resposta = pm.response.json();\r",
+							"\r",
+							"pm.collectionVariables.set(\"idUser\", resposta._id);\r",
+							"\r",
+							"pm.test(\"Id de usuário gerado com sucesso\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"idUser\")).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"GustavoTeste\",\r\n  \"email\": \"gustavo@testeqa.com\",\r\n  \"password\": \"gteste01\",\r\n  \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}usuarios",
+					"host": [
+						"{{baseUrl}}usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar Usuário Admin - Email já está em uso",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 400\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para cadastro não realizado - email em uso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Este email já está sendo usado\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idVazio\", pm.response.json()._id);\r",
+							"\r",
+							"pm.test(\"Id de usuário não gerado\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"idVazio\")).to.be.undefined;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"GustavoTeste\",\r\n  \"email\": \"gustavo@testeqa.com\",\r\n  \"password\": \"gteste01\",\r\n  \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}usuarios",
+					"host": [
+						"{{baseUrl}}usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login no Sistema - Válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para Login realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Login realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"authtoken\", pm.response.json().authorization);\r",
+							"\r",
+							"const token = pm.collectionVariables.get(\"authtoken\");\r",
+							"pm.test(\"JWT com estrutura OK\", function () {\r",
+							"    pm.expect(token).to.not.be.undefined;\r",
+							"    pm.expect(token).to.match(/^Bearer\\s[\\w-]+\\.[\\w-]+\\.[\\w-]+$/);\r",
+							"\r",
+							"    const jwt = token.replace(\"Bearer \", \"\").split(\".\");\r",
+							"\r",
+							"    pm.expect(jwt.length).to.eql(3);\r",
+							"    pm.expect(jwt[0].length).to.above(30);  // header\r",
+							"    pm.expect(jwt[2].length).to.above(40);  // signature\r",
+							"\r",
+							"    const base64 = jwt[1].replace(/-/g, '+').replace(/_/g, '/');\r",
+							"    const decodedPayload = JSON.parse(atob(base64));\r",
+							"\r",
+							"    // Verifica presença de campos obrigatórios\r",
+							"    pm.expect(decodedPayload).to.have.property(\"email\");\r",
+							"    pm.expect(decodedPayload.email).to.match(/^[^@]+@[^@]+\\.[a-zA-Z]{2,}$/);\r",
+							"\r",
+							"    pm.expect(decodedPayload).to.have.property(\"iat\");\r",
+							"    pm.expect(decodedPayload).to.have.property(\"exp\");\r",
+							"    pm.expect(decodedPayload.exp).to.be.above(decodedPayload.iat);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"gustavo@testeqa.com\",\r\n  \"password\": \"gteste01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}login",
+					"host": [
+						"{{baseUrl}}login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar Produto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Produto cadastrado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idProduto\", pm.response.json()._id);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"Razer Deathadder v2\",\r\n  \"preco\": 300,\r\n  \"descricao\": \"Mouse\",\r\n  \"quantidade\": 200\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}produtos",
+					"host": [
+						"{{baseUrl}}produtos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar Carrinho",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cadastro realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idCarrinho\", pm.response.json()._id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"produtos\": [\r\n    {\r\n      \"idProduto\": \"{{idProduto}}\",\r\n      \"quantidade\": 10\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}carrinhos",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Concluir Compra",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Concluir compra\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}carrinhos/concluir-compra",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					],
+					"path": [
+						"concluir-compra"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar Carrinho - 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cadastro realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idCarrinho\", pm.response.json()._id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"produtos\": [\r\n    {\r\n      \"idProduto\": \"{{idProduto}}\",\r\n      \"quantidade\": 10\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}carrinhos",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desistir de Compra",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Concluir compra\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}carrinhos/cancelar-compra",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					],
+					"path": [
+						"cancelar-compra"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desistir de Compra - Sem produtos no carrinho",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Concluir compra\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Não foi encontrado carrinho para esse usuário\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}carrinhos/cancelar-compra",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					],
+					"path": [
+						"cancelar-compra"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Produto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Registro excluído com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apagar User Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para exclusão de registro\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}usuarios/:_id",
+					"host": [
+						"{{baseUrl}}usuarios"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idUser}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "idUser",
+			"value": ""
+		},
+		{
+			"key": "authtoken",
+			"value": ""
+		},
+		{
+			"key": "idVazio",
+			"value": ""
+		},
+		{
+			"key": "idProduto",
+			"value": ""
+		},
+		{
+			"key": "idCarrinho",
+			"value": ""
+		}
+	]
+}

@@ -1,0 +1,838 @@
+{
+	"info": {
+		"_postman_id": "f66e8b22-949b-4d3c-b1b7-08a817a27f5f",
+		"name": "4 - Testes de Integração",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43926541",
+		"_collection_link": "https://suprah-6305431.postman.co/workspace/Testes-de-API---ServeRest~b38aafb2-7a13-49a9-ba9b-f77196178608/collection/43926541-f66e8b22-949b-4d3c-b1b7-08a817a27f5f?action=share&source=collection_link&creator=43926541"
+	},
+	"item": [
+		{
+			"name": "Criar Usuário Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para cadastro realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"const resposta = pm.response.json();\r",
+							"\r",
+							"pm.collectionVariables.set(\"idUser\", resposta._id);\r",
+							"\r",
+							"pm.test(\"Id de usuário gerado com sucesso\", function () {\r",
+							"    pm.expect(pm.collectionVariables.get(\"idUser\")).to.not.be.undefined;\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"GustavoTeste\",\r\n  \"email\": \"gustavo@testeqa.com\",\r\n  \"password\": \"gteste01\",\r\n  \"administrador\": \"true\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}usuarios",
+					"host": [
+						"{{baseUrl}}usuarios"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login no Sistema - Válido",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para Login realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Login realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"authtoken\", pm.response.json().authorization);\r",
+							"\r",
+							"const token = pm.collectionVariables.get(\"authtoken\");\r",
+							"pm.test(\"JWT com estrutura OK\", function () {\r",
+							"    pm.expect(token).to.not.be.undefined;\r",
+							"    pm.expect(token).to.match(/^Bearer\\s[\\w-]+\\.[\\w-]+\\.[\\w-]+$/);\r",
+							"\r",
+							"    const jwt = token.replace(\"Bearer \", \"\").split(\".\");\r",
+							"\r",
+							"    pm.expect(jwt.length).to.eql(3);\r",
+							"    pm.expect(jwt[0].length).to.above(30);  // header\r",
+							"    pm.expect(jwt[2].length).to.above(40);  // signature\r",
+							"\r",
+							"    const base64 = jwt[1].replace(/-/g, '+').replace(/_/g, '/');\r",
+							"    const decodedPayload = JSON.parse(atob(base64));\r",
+							"\r",
+							"    // Verifica presença de campos obrigatórios\r",
+							"    pm.expect(decodedPayload).to.have.property(\"email\");\r",
+							"    pm.expect(decodedPayload.email).to.match(/^[^@]+@[^@]+\\.[a-zA-Z]{2,}$/);\r",
+							"\r",
+							"    pm.expect(decodedPayload).to.have.property(\"iat\");\r",
+							"    pm.expect(decodedPayload).to.have.property(\"exp\");\r",
+							"    pm.expect(decodedPayload.exp).to.be.above(decodedPayload.iat);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"gustavo@testeqa.com\",\r\n  \"password\": \"gteste01\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}login",
+					"host": [
+						"{{baseUrl}}login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar Produto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"if (pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"\r",
+							"\r",
+							"pm.test(\"Produto cadastrado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idProduto\", pm.response.json()._id);\r",
+							"\r",
+							"}));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"nome\": \"Razer Deathadder v3\",\r\n  \"preco\": 300,\r\n  \"descricao\": \"Mouse\",\r\n  \"quantidade\": 200\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}produtos",
+					"host": [
+						"{{baseUrl}}produtos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verificar qtd Produtos - Antes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"qtdProdutos\", pm.response.json().quantidade);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar Carrinho",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"//Fixed syntax error in the third test\r",
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cadastro realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idCarrinho\", pm.response.json()._id);\r",
+							"\r",
+							"pm.test(\"Verificar atualização da quantidade de produtos\", function () {\r",
+							"    // Pega o valor de qtdProdutos da variável de coleção\r",
+							"    let qtdAtual = parseInt(pm.collectionVariables.get(\"qtdProdutos\"));\r",
+							"    // Pega a quantidade do corpo da requisição (quantidade de produtos a serem adicionados ao carrinho)\r",
+							"    let reqBody = JSON.parse(pm.request.body.raw);\r",
+							"    let quantidade = reqBody.produtos[0].quantidade;\r",
+							"\r",
+							"    // Valida se a variável qtdProdutos foi setada corretamente\r",
+							"    if (isNaN(qtdAtual) || isNaN(quantidade)) {\r",
+							"        throw new Error(\"Valores inválidos: qtdAtual = \" + qtdAtual + \", quantidade = \" + quantidade);\r",
+							"    }\r",
+							"\r",
+							"    // Atualiza a quantidade na variável de coleção\r",
+							"    pm.collectionVariables.set(\"qtdProdutos\", qtdAtual - quantidade);\r",
+							"    console.log(\"Nova qtdProdutos:\", pm.collectionVariables.get(\"qtdProdutos\"));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"produtos\": [\r\n    {\r\n      \"idProduto\": \"{{idProduto}}\",\r\n      \"quantidade\": 10\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}carrinhos",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verificar qtd Produtos - Depois de adicionar ao carrinho",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar quantidade de produtos\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.quantidade).to.eql(190);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Concluir Compra",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Concluir compra\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar quantidade de produtos no estoque\", function () {\r",
+							"    let qtdPosCompra = parseInt(pm.collectionVariables.get(\"qtdProdutos\"));\r",
+							"    pm.expect(qtdPosCompra).to.be.eql(190);\r",
+							"\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}carrinhos/concluir-compra",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					],
+					"path": [
+						"concluir-compra"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verificar qtd Produtos - Depois da Compra",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar quantidade de produtos\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.quantidade).to.eql(190);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cadastrar Carrinho - 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Cadastro realizado com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Cadastro realizado com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"idCarrinho\", pm.response.json()._id);\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"produtos\": [\r\n    {\r\n      \"idProduto\": \"{{idProduto}}\",\r\n      \"quantidade\": 10\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseUrl}}carrinhos",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verificar qtd Produtos - Depois de adicionar ao carrinho 2vez",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar quantidade de produtos\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.quantidade).to.eql(180);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desistir de Compra",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Concluir compra\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar que a quantidade de produtos voltou ao estoque após desistência da compra\", function () {\r",
+							"    let qtdAtual = parseInt(pm.collectionVariables.get(\"qtdProdutos\"));\r",
+							"    pm.expect(qtdAtual).to.eql(190);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}carrinhos/cancelar-compra",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					],
+					"path": [
+						"cancelar-compra"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Verificar qtd Produtos - Depois de desistir da compra",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validar quantidade de produtos\", function () {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.quantidade).to.eql(190);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Desistir de Compra - Sem produtos no carrinho",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Concluir compra\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Não foi encontrado carrinho para esse usuário\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}carrinhos/cancelar-compra",
+					"host": [
+						"{{baseUrl}}carrinhos"
+					],
+					"path": [
+						"cancelar-compra"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remover Produto",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Registro excluído com sucesso\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "apikey",
+					"apikey": [
+						{
+							"key": "value",
+							"value": "{{authtoken}}",
+							"type": "string"
+						},
+						{
+							"key": "key",
+							"value": "Authorization",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}produtos/:_id",
+					"host": [
+						"{{baseUrl}}produtos"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idProduto}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Apagar User Admin",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Mensagem para exclusão de registro\", function () {\r",
+							"    pm.expect(pm.response.text()).to.include(\"Registro excluído com sucesso\");\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}usuarios/:_id",
+					"host": [
+						"{{baseUrl}}usuarios"
+					],
+					"path": [
+						":_id"
+					],
+					"variable": [
+						{
+							"key": "_id",
+							"value": "{{idUser}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "idUser",
+			"value": ""
+		},
+		{
+			"key": "authtoken",
+			"value": ""
+		},
+		{
+			"key": "idVazio",
+			"value": ""
+		},
+		{
+			"key": "idProduto",
+			"value": ""
+		},
+		{
+			"key": "idCarrinho",
+			"value": ""
+		},
+		{
+			"key": "qtdProdutos",
+			"value": ""
+		}
+	]
+}
